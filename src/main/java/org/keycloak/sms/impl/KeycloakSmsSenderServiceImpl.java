@@ -8,6 +8,7 @@ import org.keycloak.sms.impl.gateway.Gateways;
 import org.keycloak.sms.impl.gateway.SMSService;
 import org.keycloak.sms.impl.gateway.aws.snsclient.SnsNotificationService;
 import org.keycloak.sms.impl.gateway.isendpro.ISendProdSMSService;
+import org.keycloak.sms.impl.gateway.simulation.SmsSimulationService;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -125,6 +126,9 @@ public class KeycloakSmsSenderServiceImpl implements KeycloakSmsSenderService {
                     break;
                 case AMAZON_SNS:
                     smsService = new SnsNotificationService();
+                    break;
+                case SIMULATION:
+                    smsService = new SmsSimulationService();
                     break;
                 default:
                     smsService = new SnsNotificationService();

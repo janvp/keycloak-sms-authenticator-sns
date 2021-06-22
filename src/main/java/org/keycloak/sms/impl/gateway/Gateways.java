@@ -6,5 +6,6 @@ package org.keycloak.sms.impl.gateway;
 public enum Gateways {
     AMAZON_SNS,
     LYRA_SMS,
-    ISENDPRO_SMS
+    ISENDPRO_SMS,
+    SIMULATION
 }
