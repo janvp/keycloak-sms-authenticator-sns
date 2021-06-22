@@ -88,7 +88,6 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sns</artifactId>
             <version>${version.aws-java-sdk-sns}</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -115,7 +114,6 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>${version.commons-lang}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
