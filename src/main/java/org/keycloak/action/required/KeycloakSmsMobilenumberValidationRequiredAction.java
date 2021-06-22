@@ -76,16 +76,7 @@ public class KeycloakSmsMobilenumberValidationRequiredAction implements Required
     public void processAction(RequiredActionContext context) {
         logger.debug("action called ... context = " + context);
 
-        boolean changeNumber = Boolean.valueOf(context.getHttpRequest().getFormParameters().getFirst("changeNumber"));
-        logger.debug("Change Number from validation action ? "+changeNumber);
-
-        if (changeNumber) {
-            context.getUser().removeAttribute("mobile_number");
-            context.getUser().removeAttribute("mobile_number_verified");
-            context.getUser().removeRequiredAction(KeycloakSmsMobilenumberValidationRequiredAction.PROVIDER_ID);
-            context.getUser().addRequiredAction(KeycloakSmsMobilenumberRequiredAction.PROVIDER_ID);
-            context.success();
-        } else if (context.getHttpRequest().getDecodedFormParameters().getFirst(KeycloakSmsConstants.ANSW_SMS_CODE) != null){
+        if (context.getHttpRequest().getDecodedFormParameters().getFirst(KeycloakSmsConstants.ANSW_SMS_CODE) != null){
             KeycloakSmsSenderService provider = context.getSession().getProvider(KeycloakSmsSenderService.class);
             KeycloakSmsSenderService.CODE_STATUS status = provider.validateCode(context);
             Response challenge;

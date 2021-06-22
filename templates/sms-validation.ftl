@@ -23,10 +23,6 @@
                     <div class="${properties.kcFormButtonsWrapperClass!}">
                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}" name="login" id="kc-login" type="submit" value="${msg("doSubmit")}"/>
                  </div>
-                 <div class="${properties.kcFormButtonsWrapperClass!}">
-                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}" id="kc-change-number" type="submit" value="${msg("doChangeNumber")}" onclick="setChangeNumberInput()"/>
-                        <input id="changeNumber" name="changeNumber" type="hidden" value="false" />
-                 </div>
             </div>
         </form>
     </#if>

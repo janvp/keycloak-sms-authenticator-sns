@@ -1,9 +1,5 @@
 package org.keycloak.authenticator;
 
-import org.keycloak.action.required.KeycloakSmsMobilenumberValidationRequiredAction;
-import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.services.Urls;
-import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.sms.KeycloakSmsConstants;
 import org.keycloak.sms.KeycloakSmsSenderService;
 import org.keycloak.sms.impl.KeycloakSmsUtil;
@@ -13,11 +9,8 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.models.*;
-import org.keycloak.services.resources.RealmsResource;
 
 import javax.ws.rs.core.Response;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -104,48 +97,37 @@ public class KeycloakSmsAuthenticator implements Authenticator {
     public void action(AuthenticationFlowContext context) {
         logger.debug("action called ... context = " + context);
 
-        boolean changeNumber = Boolean.valueOf(context.getHttpRequest().getFormParameters().getFirst("changeNumber"));
+        KeycloakSmsSenderService provider = context.getSession().getProvider(KeycloakSmsSenderService.class);
+        KeycloakSmsSenderService.CODE_STATUS status = provider.validateCode(context);
+        Response challenge = null;
+        switch (status) {
+            case EXPIRED:
+                challenge = context.form()
+                        .setError("sms-auth.code.expired")
+                        .createForm("sms-validation.ftl");
+                context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE, challenge);
+                break;
 
-        logger.info("Change Number from validation action ? "+changeNumber);
-        if (changeNumber) {
-            context.getUser().removeAttribute("mobile_number");
-            context.getUser().removeAttribute("mobile_number_verified");
-            context.getUser().removeRequiredAction(KeycloakSmsMobilenumberValidationRequiredAction.PROVIDER_ID);
-            context.getUser().addRequiredAction(KeycloakSmsMobilenumberRequiredAction.PROVIDER_ID);
-            context.success();
-        } else {
-            KeycloakSmsSenderService provider = context.getSession().getProvider(KeycloakSmsSenderService.class);
-            KeycloakSmsSenderService.CODE_STATUS status = provider.validateCode(context);
-            Response challenge = null;
-            switch (status) {
-                case EXPIRED:
+            case INVALID:
+                if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.ALTERNATIVE) {
+                    logger.debug("Calling context.attempted()");
+                    context.attempted();
+                } else if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
                     challenge = context.form()
-                            .setError("sms-auth.code.expired")
+                            .setError("sms-auth.code.invalid")
                             .createForm("sms-validation.ftl");
-                    context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE, challenge);
-                    break;
+                    context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+                } else {
+                    // Something strange happened
+                    logger.warn("Undefined execution ...");
+                }
+                break;
 
-                case INVALID:
-                    if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.ALTERNATIVE) {
-                        logger.debug("Calling context.attempted()");
-                        context.attempted();
-                    } else if (context.getExecution().getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
-                        challenge = context.form()
-                                .setError("sms-auth.code.invalid")
-                                .createForm("sms-validation.ftl");
-                        context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-                    } else {
-                        // Something strange happened
-                        logger.warn("Undefined execution ...");
-                    }
-                    break;
+            case VALID:
+                context.success();
+                provider.updateVerifiedMobilenumber(context.getUser());
+                break;
 
-                case VALID:
-                    context.success();
-                    provider.updateVerifiedMobilenumber(context.getUser());
-                    break;
-
-            }
         }
     }
 
