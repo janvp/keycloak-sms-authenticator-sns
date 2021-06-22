@@ -81,6 +81,7 @@ public class KeycloakSmsMobilenumberValidationRequiredAction implements Required
 
         if (changeNumber) {
             context.getUser().removeAttribute("mobile_number");
+            context.getUser().removeAttribute("mobile_number_verified");
             context.getUser().removeRequiredAction(KeycloakSmsMobilenumberValidationRequiredAction.PROVIDER_ID);
             context.getUser().addRequiredAction(KeycloakSmsMobilenumberRequiredAction.PROVIDER_ID);
             context.success();

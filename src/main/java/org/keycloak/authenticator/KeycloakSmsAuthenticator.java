@@ -109,6 +109,7 @@ public class KeycloakSmsAuthenticator implements Authenticator {
         logger.info("Change Number from validation action ? "+changeNumber);
         if (changeNumber) {
             context.getUser().removeAttribute("mobile_number");
+            context.getUser().removeAttribute("mobile_number_verified");
             context.getUser().removeRequiredAction(KeycloakSmsMobilenumberValidationRequiredAction.PROVIDER_ID);
             context.getUser().addRequiredAction(KeycloakSmsMobilenumberRequiredAction.PROVIDER_ID);
             context.success();
