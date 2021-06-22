@@ -76,7 +76,7 @@ public class KeycloakSmsUtil {
     public static String checkAndFormatMobileNumber(String mobileNumber) throws Exception {
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phone = phoneUtil.parse(mobileNumber, "FR");
+        Phonenumber.PhoneNumber phone = phoneUtil.parse(mobileNumber, "BE");
 
         if (!phoneUtil.getNumberType(phone).equals(PhoneNumberUtil.PhoneNumberType.MOBILE)) {
             logger.error("Invalid mobile phone number (not a mobile)");
